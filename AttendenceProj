@@ -37,5 +37,23 @@ while True:
     imgS = cv2.cvtColor(imgS, cv2.COLOR_BGR5552RGB)
     
     facesCurrFrame = face_recognition.face_locations(imgS)
-    encodeCurrFrame = face_recognition.face_encodings(img)[0]
+    encodeCurrFrame = face_recognition.face_encodings(imgS, facesCurrFrame)
+    
+    for encodeFace, faceLoc in zip(encodeCurrFrame, facesCurrFrame):
+        matches = face_recognition.compare_faces(encodeListKnown, encodeFace)
+        faceDist = face_recognition.face_distance(encodeListKnown, encodeFace)
+        #print(faceDist)
+        matchIndex = np.argmin(faceDist)
+
+        if matches[matchIndex]:
+            name = classNames[matchIndex].upper()
+            print(name)
+            y1, x2, y2, x1 = faceLoc
+            y1, x2, y2, x1 = y1*4, x2*4, y2*4, x1*4
+            cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv2.putText(img, name, (x1+6, y1-6), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            
+            
+    cv2.imshow('Webcam', img)
+    cv2.waitKey(1) 
     
